@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .dashboard h1 {
+            margin-top: 0;
+            font-family: poppins;
+            color: #333;
+        }
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .button {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+        .button:hover {
+            background-color: #333;
+        }
+        .order-form { background-color: #007bff; }
+        .sales-bill { background-color: #28a745; }
+        .payment { background-color: #ffc107; }
+        .receipt { background-color: #17a2b8; }
+        .booking { background-color: #dc3545; }
+        .ledger { background-color: #6c757d; }
+        .settings { background-color: #fd7e14; }
+        .logout { background-color: #343a40; }
+        .logout:hover {
+            background-color: #212529;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>Dashboard</h1>
+        <div class="button-container">
+            <a href="Enter/order.html" class="button order-form">Order Form</a>
+            <a href="Enter/Quatation.html" class="button sales-bill">Quatation</a>
+            <a href="Enter/Payment.html" class="button payment">Payment</a>
+            <a href="Enter/Receipt.html" class="button receipt">Receipt</a>
+            <a href="#booking" class="button booking">Hotel/Resort Booking</a>
+            <a href="Enter/Party.html" class="button ledger">party</a>
+            <a href="#settings" class="button settings">Settings</a>
+            <a href="#" class="button logout" id="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

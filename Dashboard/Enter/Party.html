@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Party Details Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group input[type="file"] {
+            padding: 0;
+        }
+        .form-actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .form-actions button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 5px;
+        }
+        .form-actions button.delete {
+            background-color: #dc3545;
+        }
+        .form-actions button.edit {
+            background-color: #ffc107;
+        }
+        .form-actions button.close {
+            background-color: #6c757d;
+        }
+        .form-actions button.submit {
+            background-color: #28a745;
+        }
+        .form-actions button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Party Details Form</h1>
+        <form>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone No</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+            <div class="form-group">
+                <label for="type">Type</label>
+                <select id="type" name="type" required>
+                    <option value="Employee">Employee</option>
+                    <option value="Sundry Party">Sundry Party</option>
+                    <option value="Owner">Owner</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="photo">Upload Photo</label>
+                <input type="file" id="photo" name="photo" accept="image/*">
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="submit">Submit</button>
+                <button type="button" class="edit" onclick="editForm()">Edit</button>
+                <button type="button" class="delete" onclick="deleteForm()">Delete</button>
+                <button type="button" class="close" onclick="closeForm()">Close</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function editForm() {
+            alert("Edit button clicked");
+            // Implement edit functionality here
+        }
+
+        function deleteForm() {
+            alert("Delete button clicked");
+            // Implement delete functionality here
+        }
+
+        function closeForm() {
+            alert("Close button clicked");
+            // Implement close functionality here
+            // For example, you might redirect the user or hide the form
+        }
+    </script>
+</body>
+</html>

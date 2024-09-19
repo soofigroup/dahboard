@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quatation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Existing Styles ... */
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7f6;
+            margin: 0;
+            padding: 0;
+        }
+        
+
+        .form-container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: calc(100% - 16px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .form-group input:disabled {
+            background-color: #f9f9f9;
+            cursor: not-allowed;
+        }
+
+        .form-group button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #fff;
+        }
+
+        .form-group button.save {
+            background-color: #4CAF50;
+        }
+
+        .form-group button.print {
+            background-color: #2196F3;
+        }
+
+        .form-group button.clear {
+            background-color: #f44336;
+        }
+
+        .form-group button.delete {
+            background-color: #e7e7e7;
+            color: black;
+        }
+
+        .form-group button.close {
+            background-color: #9E9E9E;
+        }
+
+        .form-group button.details {
+            background-color: #ffc107;
+        }
+
+        .form-group button.search {
+            background-color: #ff5722;
+            margin-left: 8px;
+        }
+
+        .form-group .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .form-group .checkbox-group input {
+            margin-right: 10px;
+        }
+
+        .form-group .checkbox-group label {
+            margin-right: 20px;
+        }
+
+        .form-group #description {
+            width: 100%;
+            height: 80px;
+        }
+
+        /* Print Template Styles */
+        .print-container {
+            width: 100%;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+       
+
+        .print-container header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .print-container .logo {
+            max-width: 250px;
+            margin-bottom: 10px;
+        }
+
+        .print-container .header-text {
+            font-family: 'Lemon Milk', sans-serif;
+            font-size: 15px;
+            color: #ffffff;
+            background-color: #107895;
+            border-radius: 15px;
+            padding: 5px;
+            display: inline-block;
+        }
+
+
+
+        .print-container table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .print-container table,
+        .print-container th,
+        .print-container td {
+            border: 1px solid #000;
+        }
+
+        .print-container th,
+        .print-container td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        .print-container footer {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+
+        /* Existing Print Styles (Optional) */
+        /*
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            #printableArea,
+            #printableArea * {
+                visibility: visible;
+            }
+
+            #printableArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 30px;
+            }
+
+            .form-container {
+                display: none;
+            }
+        }
+        */
+    </style>
+</head>
+
+<body>
+
+    <div class="form-container">
+        <form id="Quatation">
+            <h2>Quatation</h2>
+
+            <!-- Serial Number -->
+            <div class="form-group">
+                <label for="serialNumber">Serial Number</label>
+                <input type="text" id="serialNumber" readonly>
+                <button type="button" class="search" onclick="searchForm()">Search</button>
+            </div>
+
+            <!-- Date -->
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input type="date" id="date" readonly>
+            </div>
+
+            <!-- Party (Name) -->
+            <div class="form-group">
+                <label for="party">Party</label>
+                <input type="text" id="party" placeholder="Enter party name" required>
+                <button type="button" class="details" onclick="showPartyDetails()">Details</button>
+            </div>
+
+            <!-- Phone No -->
+            <div class="form-group">
+                <label for="phone">Phone No</label>
+                <input type="text" id="phone" placeholder="Enter phone number" required>
+            </div>
+
+            <!-- Pickup -->
+            <div class="form-group">
+                <label for="pickup">Pickup</label>
+                <input type="text" id="pickup" placeholder="Pickup location" required>
+            </div>
+
+            <!-- Place of Travel -->
+            <div class="form-group">
+                <label for="placeOfTravel">Place of Travel</label>
+                <input type="text" id="placeOfTravel" placeholder="Place of travel" required>
+            </div>
+
+            <!-- Date of Travel -->
+            <div class="form-group">
+                <label for="dateOfTravel">Date of Travel</label>
+                <input type="date" id="dateOfTravel" required>
+            </div>
+
+            <!-- Time of Travel -->
+            <div class="form-group">
+                <label for="timeOfTravel">Time of Travel</label>
+                <select id="timeOfTravel" required>
+                    <option value="">Select Time</option>
+                    <option value="Day">Day</option>
+                    <option value="Night">Night</option>
+                </select>
+            </div>
+
+            <!-- Return Date of Travel -->
+            <div class="form-group">
+                <label for="returnDateOfTravel">Return Date of Travel</label>
+                <input type="date" id="returnDateOfTravel">
+            </div>
+
+            <!-- Return Time of Travel -->
+            <div class="form-group">
+                <label for="returnTimeOfTravel">Return Time of Travel</label>
+                <select id="returnTimeOfTravel">
+                    <option value="">Select Time</option>
+                    <option value="Day">Day</option>
+                    <option value="Night">Night</option>
+                </select>
+            </div>
+
+            <!-- Type of Travel -->
+            <div class="form-group">
+                <label for="typeOfTravel">Type of Travel</label>
+                <select id="typeOfTravel" required>
+                    <option value="">Select Type</option>
+                    <option value="Family Packages">Family Packages</option>
+                    <option value="College Packages">College Packages</option>
+                    <option value="IV Packages">IV Packages</option>
+                    <option value="School Package">School Package</option>
+                    <option value="Customized Package">Customized Package</option>
+                </select>
+            </div>
+
+            <!-- Package Includes -->
+            <div class="form-group">
+                <label>Package Includes</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="includeTransport"><label for="includeTransport">Transport</label>
+                    <input type="checkbox" id="includeMeals"><label for="includeMeals">Meals</label>
+                    <input type="checkbox" id="includeAccommodation"><label for="includeAccommodation">Accommodation</label>
+                    <input type="checkbox" id="includeGuides"><label for="includeGuides">Guides</label>
+                    <input type="checkbox" id="includeDJ"><label for="includeDJ">DJ/Campfire</label>
+                    <input type="checkbox" id="includeFreshup"><label for="includeFreshup">Freshup</label>
+                    <input type="checkbox" id="includeSiteseeing"><label for="includeSiteseeing">Siteseeing Ticket</label>
+                </div>
+            </div>
+
+            <!-- Description Box -->
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" placeholder="Enter any additional details"></textarea>
+            </div>
+
+            <!-- Members -->
+            <div class="form-group">
+                <label for="members">Members</label>
+                <input type="number" id="members" placeholder="Enter number of members" required>
+            </div>
+
+            <!-- Complimentary -->
+            <div class="form-group">
+                <label for="complimentary">Complimentary</label>
+                <input type="number" id="complimentary" placeholder="Enter complimentary members" required>
+            </div>
+
+            <!-- Per Head Amount -->
+            <div class="form-group">
+                <label for="perHeadAmount">Per Head Amount</label>
+                <input type="number" id="perHeadAmount" placeholder="Enter amount per head" required>
+            </div>
+
+            <!-- Total Amount -->
+            <div class="form-group">
+                <label for="totalAmount">Total Amount</label>
+                <input type="number" id="totalAmount" readonly>
+            </div>
+
+            <!-- Advance -->
+            <div class="form-group">
+                <label for="advance">Advance</label>
+                <input type="number" id="advance" placeholder="Enter advance amount">
+            </div>
+
+            <!-- Balance Amount -->
+            <div class="form-group">
+                <label for="balanceAmount">Balance Amount</label>
+                <input type="number" id="balanceAmount" readonly>
+            </div>
+
+            <!-- Buttons -->
+            <div class="form-group">
+                <button type="button" class="save" onclick="saveAndPrint()">Save & Print</button>
+                <button type="button" class="clear" onclick="clearForm()">Clear</button>
+                <button type="button" class="delete" onclick="deleteForm()">Delete</button>
+                <button type="button" class="close" onclick="closeForm()">Close</button>
+            </div>
+        </form>
+    </div>
+
+<!-- Print Template -->
+<div id="printTemplate" style="display: none;">
+    <div class="print-container">
+        <header>
+            <h1 style="font-family: poppins;color: #107895;">SOOFI TRAVELOGUES </h2>
+            <p style="font-size: 15px; color: #ffc107; font-family: Lemon Milk; background-color: #000000; border-radius: 15px; padding: 5px; display: inline-block;">&nbsp;&nbsp;&nbsp;All India Tour Package Team&nbsp;&nbsp;&nbsp;</p>
+            <address>
+                <p>Malappuram | Kozhikode | Kannur | Thrissur | Mangalore</p>
+                <p>70254 50050 | 7994 189 193 | 7559 894 744</p>
+                <p>soofitravelogues@gmail.com</p>
+                <p>@soofi_travelogues</p>
+            </address>
+            <hr style="border: 1px solid #107895; margin-top: 10px;">
+            <h1>Quatation</h1>
+        </header>
+        <main>
+            <!-- Content without table -->
+            <p><strong>Serial Number:</strong> <span id="printSerialNumber"></span></p>
+            <p><strong>Date:</strong> <span id="printDate"></span></p>
+            <p><strong>Party:</strong> <span id="printParty"></span></p>
+            <p><strong>Phone No:</strong> <span id="printPhone"></span></p>
+            <p><strong>Pickup:</strong> <span id="printPickup"></span></p>
+            <p><strong>Place of Travel:</strong> <span id="printPlaceOfTravel"></span></p>
+            <p><strong>Date of Travel:</strong> <span id="printDateOfTravel"></span></p>
+            <p><strong>Time of Travel:</strong> <span id="printTimeOfTravel"></span></p>
+            <p><strong>Return Date of Travel:</strong> <span id="printReturnDateOfTravel"></span></p>
+            <p><strong>Return Time of Travel:</strong> <span id="printReturnTimeOfTravel"></span></p>
+            <p><strong>Type of Travel:</strong> <span id="printTypeOfTravel"></span></p>
+            <p><strong>Package Includes:</strong></p>
+            <ul>
+                <li id="printTransport"></li>
+                <li id="printMeals"></li>
+                <li id="printAccommodation"></li>
+                <li id="printGuides"></li>
+                <li id="printDJ"></li>
+                <li id="printFreshup"></li>
+                <li id="printSiteseeing"></li>
+            </ul>
+            <p><strong>Description:</strong> <span id="printDescription"></span></p>
+            <p><strong>Number of Members:</strong> <span id="printMembers"></span></p>
+            <p><strong>Complimentary Members:</strong> <span id="printComplimentary"></span></p>
+            <p><strong>Per Head Amount:</strong> <span id="printPerHeadAmount"></span></p>
+            <p><strong>Total Amount:</strong> <span id="printTotalAmount"></span></p>
+            <p><strong>Advance:</strong> <span id="printAdvance"></span></p>
+            <p><strong>Balance Amount:</strong> <span id="printBalanceAmount"></span></p>
+        </main>
+        <footer>
+            <p>NB:This is a quotation only and the rate will change depending on the date</p>
+        </footer>
+    </div>
+</div>
+
+    <script>
+        // Auto-generate serial number and current date
+        window.onload = function () {
+            document.getElementById('serialNumber').value = generateSerialNumber();
+            document.getElementById('date').value = new Date().toISOString().split('T')[0];
+            calculateTotal();
+        };
+
+        function generateSerialNumber() {
+            let lastSerialNumber = localStorage.getItem('lastSerialNumber') || 250;
+            let newSerialNumber = parseInt(lastSerialNumber) + 1;
+            localStorage.setItem('lastSerialNumber', newSerialNumber);
+            return newSerialNumber;
+        }
+
+        // Calculate total amount and balance amount in real-time
+        function calculateTotal() {
+            let members = parseInt(document.getElementById('members').value) || 0;
+            let perHeadAmount = parseInt(document.getElementById('perHeadAmount').value) || 0;
+            let totalAmount = members * perHeadAmount;
+            document.getElementById('totalAmount').value = totalAmount;
+
+            let advance = parseInt(document.getElementById('advance').value) || 0;
+            let balanceAmount = totalAmount - advance;
+            document.getElementById('balanceAmount').value = balanceAmount;
+        }
+
+        document.getElementById('members').addEventListener('input', calculateTotal);
+        document.getElementById('perHeadAmount').addEventListener('input', calculateTotal);
+        document.getElementById('advance').addEventListener('input', calculateTotal);
+
+        // Save form data and print
+        function saveAndPrint() {
+            saveData();
+            populatePrintTemplate();
+            printData();
+            disableForm();
+        }
+
+        // Save form data
+        function saveData() {
+            let formData = {
+                serialNumber: document.getElementById('serialNumber').value,
+                date: document.getElementById('date').value,
+                party: document.getElementById('party').value,
+                phone: document.getElementById('phone').value,
+                pickup: document.getElementById('pickup').value,
+                placeOfTravel: document.getElementById('placeOfTravel').value,
+                dateOfTravel: document.getElementById('dateOfTravel').value,
+                timeOfTravel: document.getElementById('timeOfTravel').value,
+                returnDateOfTravel: document.getElementById('returnDateOfTravel').value,
+                returnTimeOfTravel: document.getElementById('returnTimeOfTravel').value,
+                typeOfTravel: document.getElementById('typeOfTravel').value,
+                packageIncludes: {
+                    transport: document.getElementById('includeTransport').checked,
+                    meals: document.getElementById('includeMeals').checked,
+                    accommodation: document.getElementById('includeAccommodation').checked,
+                    guides: document.getElementById('includeGuides').checked,
+                    DJ: document.getElementById('includeDJ').checked,
+                    freshup: document.getElementById('includeFreshup').checked,
+                    siteseeing: document.getElementById('includeSiteseeing').checked,
+                },
+                description: document.getElementById('description').value,
+                members: document.getElementById('members').value,
+                complimentary: document.getElementById('complimentary').value,
+                perHeadAmount: document.getElementById('perHeadAmount').value,
+                totalAmount: document.getElementById('totalAmount').value,
+                advance: document.getElementById('advance').value,
+                balanceAmount: document.getElementById('balanceAmount').value,
+            };
+
+            localStorage.setItem(formData.serialNumber, JSON.stringify(formData));
+            alert('Data saved successfully!');
+        }
+
+        // Populate the print template
+        function populatePrintTemplate() {
+            document.getElementById('printSerialNumber').textContent = document.getElementById('serialNumber').value;
+            document.getElementById('printDate').textContent = document.getElementById('date').value;
+            document.getElementById('printParty').textContent = document.getElementById('party').value;
+            document.getElementById('printPhone').textContent = document.getElementById('phone').value;
+            document.getElementById('printPickup').textContent = document.getElementById('pickup').value;
+            document.getElementById('printPlaceOfTravel').textContent = document.getElementById('placeOfTravel').value;
+            document.getElementById('printDateOfTravel').textContent = document.getElementById('dateOfTravel').value;
+            document.getElementById('printTimeOfTravel').textContent = document.getElementById('timeOfTravel').value;
+            document.getElementById('printReturnDateOfTravel').textContent = document.getElementById('returnDateOfTravel').value;
+            document.getElementById('printReturnTimeOfTravel').textContent = document.getElementById('returnTimeOfTravel').value;
+            document.getElementById('printTypeOfTravel').textContent = document.getElementById('typeOfTravel').value;
+
+            // Package Includes
+            document.getElementById('printTransport').textContent = document.getElementById('includeTransport').checked ? "Transport" : "";
+            document.getElementById('printMeals').textContent = document.getElementById('includeMeals').checked ? "Meals" : "";
+            document.getElementById('printAccommodation').textContent = document.getElementById('includeAccommodation').checked ? "Accommodation" : "";
+            document.getElementById('printGuides').textContent = document.getElementById('includeGuides').checked ? "Guides" : "";
+            document.getElementById('printDJ').textContent = document.getElementById('includeDJ').checked ? "DJ/Campfire" : "";
+            document.getElementById('printFreshup').textContent = document.getElementById('includeFreshup').checked ? "Freshup" : "";
+            document.getElementById('printSiteseeing').textContent = document.getElementById('includeSiteseeing').checked ? "Siteseeing Ticket" : "";
+
+            document.getElementById('printDescription').textContent = document.getElementById('description').value;
+            document.getElementById('printMembers').textContent = document.getElementById('members').value;
+            document.getElementById('printComplimentary').textContent = document.getElementById('complimentary').value;
+            document.getElementById('printPerHeadAmount').textContent = document.getElementById('perHeadAmount').value;
+            document.getElementById('printTotalAmount').textContent = document.getElementById('totalAmount').value;
+            document.getElementById('printAdvance').textContent = document.getElementById('advance').value;
+            document.getElementById('printBalanceAmount').textContent = document.getElementById('balanceAmount').value;
+        }
+
+        // Print form data
+        function printData() {
+            // Create a new window for printing
+            var printWindow = window.open('', '', 'height=800,width=800');
+            printWindow.document.write('<html><head><title>Print quatation</title>');
+            // Include the necessary styles
+            printWindow.document.write('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">');
+            printWindow.document.write('<style>');
+            printWindow.document.write(`
+                .print-container {
+                    width: 100%;
+                    padding: 20px;
+                    font-family: Arial, sans-serif;
+                }
+                .print-container header {
+                    text-align: center;
+                    margin-bottom: 20px;
+                }
+                .print-container .logo {
+                    max-width: 150px;
+                    margin-bottom: 10px;
+                }
+                .print-container table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 20px;
+                }
+                .print-container table, 
+                .print-container th, 
+                .print-container td {
+                    border: 1px solid #000;
+                }
+                .print-container th, 
+                .print-container td {
+                    padding: 10px;
+                    text-align: left;
+                }
+                .print-container footer {
+                    text-align: center;
+                    font-size: 12px;
+                    margin-top: 20px;
+                }
+            `);
+            printWindow.document.write('</style>');
+            printWindow.document.write('</head><body >');
+            // Get the content of the printTemplate div
+            var printContent = document.getElementById('printTemplate').innerHTML;
+            printWindow.document.write(printContent);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            // Delay printing to ensure all resources are loaded
+            setTimeout(function () {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        }
+
+        // Clear form data
+        function clearForm() {
+            document.getElementById('orderForm').reset();
+            calculateTotal();
+            // Re-enable form inputs in case they were disabled after printing
+            const inputs = document.querySelectorAll('#orderForm input, #orderForm select, #orderForm textarea');
+            inputs.forEach(input => input.disabled = false);
+        }
+
+        // Delete form data
+        function deleteForm() {
+            let serialNumber = document.getElementById('serialNumber').value;
+            if (localStorage.getItem(serialNumber)) {
+                if (confirm('Are you sure you want to delete this entry?')) {
+                    localStorage.removeItem(serialNumber);
+                    alert('Data deleted successfully!');
+                    clearForm();
+                }
+            } else {
+                alert('No data found to delete.');
+            }
+        }
+
+        // Close form (reset form)
+        function closeForm() {
+            if (confirm('Are you sure you want to close the form? Unsaved changes will be lost.')) {
+                document.getElementById('orderForm').reset();
+                calculateTotal();
+                // Re-enable form inputs in case they were disabled after printing
+                const inputs = document.querySelectorAll('#orderForm input, #orderForm select, #orderForm textarea');
+                inputs.forEach(input => input.disabled = false);
+            }
+        }
+
+        // Search form data by serial number
+        function searchForm() {
+            let serialNumber = document.getElementById('serialNumber').value;
+            let formData = JSON.parse(localStorage.getItem(serialNumber));
+
+            if (formData) {
+                document.getElementById('serialNumber').value = formData.serialNumber;
+                document.getElementById('date').value = formData.date;
+                document.getElementById('party').value = formData.party;
+                document.getElementById('phone').value = formData.phone;
+                document.getElementById('pickup').value = formData.pickup;
+                document.getElementById('placeOfTravel').value = formData.placeOfTravel;
+                document.getElementById('dateOfTravel').value = formData.dateOfTravel;
+                document.getElementById('timeOfTravel').value = formData.timeOfTravel;
+                document.getElementById('returnDateOfTravel').value = formData.returnDateOfTravel;
+                document.getElementById('returnTimeOfTravel').value = formData.returnTimeOfTravel;
+                document.getElementById('typeOfTravel').value = formData.typeOfTravel;
+
+                document.getElementById('includeTransport').checked = formData.packageIncludes.transport;
+                document.getElementById('includeMeals').checked = formData.packageIncludes.meals;
+                document.getElementById('includeAccommodation').checked = formData.packageIncludes.accommodation;
+                document.getElementById('includeGuides').checked = formData.packageIncludes.guides;
+                document.getElementById('includeDJ').checked = formData.packageIncludes.DJ;
+                document.getElementById('includeFreshup').checked = formData.packageIncludes.freshup;
+                document.getElementById('includeSiteseeing').checked = formData.packageIncludes.siteseeing;
+
+                document.getElementById('description').value = formData.description;
+                document.getElementById('members').value = formData.members;
+                document.getElementById('complimentary').value = formData.complimentary;
+                document.getElementById('perHeadAmount').value = formData.perHeadAmount;
+                document.getElementById('totalAmount').value = formData.totalAmount;
+                document.getElementById('advance').value = formData.advance;
+                document.getElementById('balanceAmount').value = formData.balanceAmount;
+
+                calculateTotal();
+                alert('Data loaded successfully!');
+            } else {
+                alert('No data found for the given serial number.');
+            }
+        }
+
+        // Show party details (placeholder function)
+        function showPartyDetails() {
+            alert('Party details feature coming soon.');
+        }
+
+        // Disable form inputs after printing
+        function disableForm() {
+            const inputs = document.querySelectorAll('#orderForm input, #orderForm select, #orderForm textarea, #orderForm button');
+            inputs.forEach(input => input.disabled = true);
+        }
+    </script>
+</body>
+
+</html>

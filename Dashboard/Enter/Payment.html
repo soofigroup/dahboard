@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Form</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e1e4e8;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: calc(100% - 40px);
+            padding: 10px;
+            border: 1px solid #d1d1d1;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+            display: inline-block;
+        }
+        .form-group button.search {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 40px;
+            background-color: transparent;
+            color: #007bff;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0;
+            transition: color 0.3s ease;
+        }
+        .form-group button.search:hover {
+            color: #0056b3;
+        }
+        .form-group input[type="file"] {
+            padding: 0;
+        }
+        .form-group button {
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px 0;
+            transition: background-color 0.3s ease;
+            color: #fff;
+        }
+        .form-group button.save {
+            background-color: #28a745;
+        }
+        .form-group button.save:hover {
+            background-color: #218838;
+        }
+        .form-group button.delete {
+            background-color: #dc3545;
+        }
+        .form-group button.delete:hover {
+            background-color: #c82333;
+        }
+        .form-group button.clear {
+            background-color: #ffc107;
+            color: #000;
+        }
+        .form-group button.clear:hover {
+            background-color: #e0a800;
+        }
+        .form-group button.close {
+            background-color: #6c757d;
+        }
+        .form-group button.close:hover {
+            background-color: #5a6268;
+        }
+        .form-group button.show-old-balance {
+            background-color: #17a2b8; /* Teal color */
+        }
+        .form-group button.show-old-balance:hover {
+            background-color: #138496; /* Darker teal */
+        }
+        .form-actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Payment Form</h1>
+        <form id="paymentForm">
+            <div class="form-group">
+                <label for="paymentNo">Payment No</label>
+                <input type="text" id="paymentNo" name="paymentNo" placeholder="Enter Payment No" readonly>
+                <button type="button" class="search" onclick="searchPaymentNo()">🔍</button>
+            </div>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter Name" required>
+                <button type="button" class="search" onclick="searchName()">🔍</button>
+            </div>
+            <div class="form-group">
+                <button type="button" class="show-old-balance" onclick="getPartyDetails()">Get Party Details</button>
+            </div>
+            <div class="form-group">
+                <label for="oldBalance">Old Balance</label>
+                <input type="number" id="oldBalance" name="oldBalance" placeholder="Old Balance">
+            </div>
+            <div class="form-group">
+                <button type="button" class="show-old-balance" onclick="showLedger()">Show Old Balance</button>
+            </div>
+            <div class="form-group">
+                <label for="receivedAmount">Received Amount</label>
+                <input type="number" id="receivedAmount" name="receivedAmount" placeholder="Received Amount" oninput="calculateBalance()">
+            </div>
+            <div class="form-group">
+                <label for="balance">Balance Amount</label>
+                <input type="number" id="balance" name="balance" placeholder="Balance Amount" readonly>
+            </div>
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+            <div class="form-group">
+                <label for="transactionMode">Mode of Transaction</label>
+                <select id="transactionMode" name="transactionMode" required>
+                    <option value="Cash">Cash</option>
+                    <option value="UPI">UPI</option>
+                    <option value="NEFT">NEFT</option>
+                    <option value="IMPS">IMPS</option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="save" onclick="saveAndPrint()">Save & Print</button>
+                <button type="button" class="delete" onclick="deletePayment()">Delete</button>
+                <button type="button" class="clear" onclick="clearForm()">Clear</button>
+                <button type="button" class="close" onclick="closeForm()">Close</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        const { jsPDF } = window.jspdf;
+
+        const PAYMENT_NUMBER_KEY = 'paymentNumber';
+
+        // Initialize payment number on page load
+        window.onload = function() {
+            initializePaymentNumber();
+            setCurrentDate();
+        };
+
+        // Initialize or retrieve payment number
+        function initializePaymentNumber() {
+            let paymentNumber = localStorage.getItem(PAYMENT_NUMBER_KEY);
+            if (!paymentNumber) {
+                paymentNumber = 360; // Starting payment number
+                localStorage.setItem(PAYMENT_NUMBER_KEY, paymentNumber);
+            }
+            document.getElementById('paymentNo').value = paymentNumber;
+        }
+
+        // Increment and update payment number in local storage
+        function incrementPaymentNumber() {
+            let paymentNumber = parseInt(localStorage.getItem(PAYMENT_NUMBER_KEY), 10);
+            paymentNumber++;
+            localStorage.setItem(PAYMENT_NUMBER_KEY, paymentNumber);
+            return paymentNumber;
+        }
+
+        function generatePaymentNumber() {
+            // Get current payment number and set it in the input
+            const paymentNumber = document.getElementById('paymentNo').value;
+            document.getElementById('paymentNo').value = paymentNumber;
+        }
+
+        function setCurrentDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+        }
+
+        function searchPaymentNo() {
+            const paymentNo = document.getElementById('paymentNo').value;
+            // Example data for demonstration
+            const data = {
+                "3600001": { name: "John Doe", balance: 1000 },
+                "3600002": { name: "Jane Smith", balance: 500 }
+            };
+            const result = data[paymentNo];
+            if (result) {
+                document.getElementById('name').value = result.name;
+                document.getElementById('oldBalance').value = result.balance;
+                calculateBalance(); // Update balance amount
+                document.getElementById('receivedAmount').focus(); // Move focus to the next input
+            } else {
+                alert("Payment No not found");
+                document.getElementById('name').value = '';
+                document.getElementById('oldBalance').value = '';
+                document.getElementById('balance').value = '';
+            }
+        }
+
+        function searchName() {
+            const name = document.getElementById('name').value;
+            // Example search functionality
+            alert("Search functionality for name needs implementation");
+        }
+
+        function getPartyDetails() {
+            const name = document.getElementById('name').value;
+            // Example implementation for party details
+            alert(`Fetching details for party: ${name}`);
+        }
+
+        function showLedger() {
+            // Open the party ledger in a new page
+            window.open('ledger.html', '_blank');
+        }
+
+        function calculateBalance() {
+            const receivedAmount = parseFloat(document.getElementById('receivedAmount').value) || 0;
+            const oldBalance = parseFloat(document.getElementById('oldBalance').value) || 0;
+            const balance = oldBalance - receivedAmount; // Corrected direction of subtraction
+            document.getElementById('balance').value = balance.toFixed(2);
+        }
+
+        function saveAndPrint() {
+    const doc = new jsPDF({
+        unit: 'mm',
+        format: 'a4' // A4 paper size
+    });
+
+    const margin = 10; // Margin around the content
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const contentWidth = pageWidth - 2 * margin;
+
+    const paymentNo = document.getElementById('paymentNo').value;
+    const name = document.getElementById('name').value;
+    const receivedAmount = parseFloat(document.getElementById('receivedAmount').value) || 0;
+    const oldBalance = parseFloat(document.getElementById('oldBalance').value) || 0;
+    const balance = parseFloat(document.getElementById('balance').value) || 0;
+    const date = document.getElementById('date').value;
+    const transactionMode = document.getElementById('transactionMode').value; // Corrected: Now ensures the mode is captured correctly
+
+    // Header
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.text("SOOFI TRAVELOGUES", margin, margin + 10);
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.text("Malappuram | Kozhikode | Kannur | Thrissur | Mangalore", margin, margin + 20);
+    doc.text("Phone: 70254 50050 | 7994 189 193 | 7559 894 744", margin, margin + 30);
+    doc.text("Mail: soofitravelogues@gmail.com", margin, margin + 40);
+    doc.text("Instagram: @soofi_travelogues", margin, margin + 50);
+    doc.line(margin, margin + 55, pageWidth - margin, margin + 55);
+
+    // Title
+    doc.setFontSize(16);
+    doc.text("Payment Bill", pageWidth / 2, margin + 65, { align: "center" });
+
+    // Body
+    doc.setFontSize(12);
+    doc.text(`Bill No: ${paymentNo}`, margin, margin + 80);
+    doc.text(`Date: ${date}`, pageWidth - margin, margin + 80, { align: "right" });
+
+    const payText = `Payed To Mr./Mrs. ${name}`;
+    const sumText = `The sum of Rupees ${receivedAmount.toFixed(2)}`;
+    const wordsText = `In words: ${numberToWords(receivedAmount)}`;
+
+    // Adjust positioning
+    let yOffset = margin + 95;
+    doc.text(payText, margin, yOffset);
+    yOffset += 10;
+    doc.text(sumText, margin, yOffset);
+    
+    // Split wordsText into multiple lines if necessary
+    const maxWidth = contentWidth; // Adjust this as needed for your document
+    const wordsTextLines = doc.splitTextToSize(wordsText, maxWidth);
+    yOffset += 10;
+    wordsTextLines.forEach(line => {
+        doc.text(line, margin, yOffset);
+        yOffset += 20; // Adjust the line height if needed
+    });
+
+    // Add mode of transaction below "In words"
+    yOffset += 10;
+    doc.text(`Mode of Transaction: ${transactionMode}`, margin, yOffset); // Ensure this line is executed
+
+    // Add balance details
+    yOffset += 10;
+    doc.text(`Old Balance: ${oldBalance.toFixed(2)}`, margin, yOffset);
+    yOffset += 10;
+    doc.text(`Amount: ${receivedAmount.toFixed(2)}`, margin, yOffset);
+    yOffset += 10;
+    doc.text(`New Balance: ${balance.toFixed(2)}`, margin, yOffset);
+
+    // Draw a line before the footer
+    yOffset += 20;
+    doc.setLineWidth(0.5);
+    doc.line(margin, yOffset, pageWidth - margin, yOffset);
+
+    // Footer
+    yOffset += 10;
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold"); // Make "For Soofi Travelogues" bold
+    const footerText1 = "For Soofi Travelogues";
+    const footerText2 = "Authorized Signature";
+    const textWidth1 = doc.getTextWidth(footerText1);
+    const textWidth2 = doc.getTextWidth(footerText2);
+
+    // Right-aligned footer text
+    doc.text(footerText1, pageWidth - margin - textWidth1, yOffset);
+    doc.setFont("helvetica", "normal"); // Reset font weight for next line
+    doc.text(footerText2, pageWidth - margin - textWidth2, yOffset + 10);
+
+    doc.save(`Payment_${paymentNo}.pdf`);
+    incrementPaymentNumber(); // Increment payment number after saving
+}
+
+
+        function numberToWords(amount) {
+            const units = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+            const teens = ['Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+            const tens = ['Ten', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            const thousands = ['Thousand', 'Million', 'Billion', 'Trillion'];
+
+            const convertNumberToWords = (num) => {
+                if (num === 0) return units[0];
+                let words = '';
+                if (num > 999) {
+                    words += convertNumberToWords(Math.floor(num / 1000)) + ' ' + thousands[0] + ' ';
+                    num %= 1000;
+                }
+                if (num > 99) {
+                    words += units[Math.floor(num / 100)] + ' Hundred ';
+                    num %= 100;
+                }
+                if (num > 10 && num < 20) {
+                    words += teens[num - 11] + ' ';
+                } else if (num > 19) {
+                    words += tens[Math.floor(num / 10) - 1] + ' ';
+                    num %= 10;
+                }
+                if (num > 0) {
+                    words += units[num] + ' ';
+                }
+                return words.trim();
+            }
+
+            return convertNumberToWords(amount).replace(/\s\s+/g, ' ');
+        }
+
+        function deletePayment() {
+            // Implement delete functionality
+            alert("Delete functionality needs implementation");
+        }
+
+        function clearForm() {
+            document.getElementById('paymentForm').reset();
+            generatePaymentNumber(); // Regenerate payment number on clear
+            setCurrentDate();
+        }
+
+        function closeForm() {
+            window.close();
+        }
+    </script>
+</body>
+</html>
