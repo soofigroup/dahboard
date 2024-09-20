@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel/Resort Booking</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #107895;
+        }
+
+        form {
+            max-width: 500px;
+            margin: auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-size: 16px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: #ffffff;
+            background-color: #107895;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0e6e7f;
+        }
+
+        .readonly {
+            background-color: #f9f9f9; /* Light gray for readonly fields */
+            cursor: not-allowed; /* Change cursor for readonly */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Resort Booking</h1>
+    <form id="bookingForm">
+        <label for="referenceNumber">Reference Number:</label>
+        <input id="referenceNumber" type="text" class="readonly" readonly>
+        
+        <label for="guestName">Guest Name:</label>
+        <input id="guestName" type="text" required>
+        
+        <label for="phoneNumber">Phone Number:</label>
+        <input id="phoneNumber" type="text" required>
+        
+        <label for="email">Email:</label>
+        <input id="email" type="email" required>
+        
+        <label for="checkIn">Check-in Date:</label>
+        <input id="checkIn" type="date" required>
+        
+        <label for="checkOut">Check-out Date:</label>
+        <input id="checkOut" type="date" required>
+        
+        <label for="adults">Adults:</label>
+        <input id="adults" type="number" required>
+        
+        <label for="children">Children:</label>
+        <input id="children" type="number">
+        
+        <label for="numberOfRooms">Number of Rooms:</label>
+        <input id="numberOfRooms" type="number" required>
+        
+        <label for="perRoomRate">Per Room Rate:</label>
+        <input id="perRoomRate" type="number" required>
+        
+        <label for="totalAmount">Total Amount:</label>
+        <input id="totalAmount" type="text" class="readonly" readonly>
+        
+        <label for="advanceAmount">Advance Amount:</label>
+        <input id="advanceAmount" type="number" required>
+        
+        <label for="balanceAmount">Balance Amount:</label>
+        <input id="balanceAmount" type="text" class="readonly" readonly>
+        
+        <label for="paymentMethod">Payment Method:</label>
+        <input id="paymentMethod" type="text" required>
+        
+        <label for="additionalServices">Additional Services:</label>
+        <input id="additionalServices" type="text">
+        
+        <button id="generatePDFButton">Save & Print</button>
+    </form>
+
+    <script>
+        // Initialize reference count if not present
+        if (!localStorage.getItem('referenceCount')) {
+            localStorage.setItem('referenceCount', 100);
+        }
+
+        function loadReferenceNumber() {
+            const referenceCount = parseInt(localStorage.getItem('referenceCount'));
+            document.getElementById('referenceNumber').value = referenceCount;
+        }
+
+        function saveReferenceNumber(newCount) {
+            localStorage.setItem('referenceCount', newCount);
+        }
+
+        function calculateTotalAmount() {
+            const numberOfRooms = document.getElementById("numberOfRooms").value || 0;
+            const perRoomRate = document.getElementById("perRoomRate").value || 0;
+            const totalAmount = numberOfRooms * perRoomRate;
+            document.getElementById("totalAmount").value = totalAmount;
+
+            const advanceAmount = document.getElementById("advanceAmount").value || 0;
+            const balanceAmount = totalAmount - advanceAmount;
+            document.getElementById("balanceAmount").value = balanceAmount;
+        }
+
+        document.getElementById("numberOfRooms").addEventListener("input", calculateTotalAmount);
+        document.getElementById("perRoomRate").addEventListener("input", calculateTotalAmount);
+        document.getElementById("advanceAmount").addEventListener("input", calculateTotalAmount);
+
+        document.getElementById('generatePDFButton').onclick = function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Retrieve and increment reference number
+            let serialNumber = parseInt(localStorage.getItem('referenceCount'));
+            document.getElementById('referenceNumber').value = serialNumber; // Update displayed number
+            saveReferenceNumber(serialNumber + 1); // Increment reference number for next use
+
+            // Retrieve input values
+            const guestName = document.getElementById("guestName").value || 'N/A';
+            const phoneNumber = document.getElementById("phoneNumber").value || 'N/A';
+            const email = document.getElementById("email").value || 'N/A';
+            const checkIn = document.getElementById("checkIn").value || 'N/A';
+            const checkOut = document.getElementById("checkOut").value || 'N/A';
+            const adults = document.getElementById("adults").value || '0';
+            const children = document.getElementById("children").value || '0';
+            const numberOfRooms = document.getElementById("numberOfRooms").value || '0';
+            const perRoomRate = document.getElementById("perRoomRate").value || '0';
+            const totalAmount = document.getElementById("totalAmount").value || '0';
+            const advanceAmount = document.getElementById("advanceAmount").value || '0';
+            const balanceAmount = document.getElementById("balanceAmount").value || '0';
+            const paymentMethod = document.getElementById("paymentMethod").value || 'N/A';
+            const additionalServices = document.getElementById("additionalServices").value || 'N/A';
+            const dateOfBooking = new Date().toLocaleDateString();
+
+            // Basic validation
+            if (!guestName || !phoneNumber || !email || !checkIn || !checkOut) {
+                alert("Please fill in all required fields.");
+                return;
+            }
+
+            // Set font style for "SOOFI TRAVELOGUES"
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(22);
+            doc.setTextColor("#107895");
+
+            // Add text with updated style
+            doc.text('SOOFI TRAVELOGUES', 10, 10);
+
+            // Reset font style for the rest of the text
+            doc.setFont("Helvetica", "normal");
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+
+            // Add other text
+            doc.text('Malappuram | Kozhikode | Thrissur | Mangalore', 10, 20);
+            doc.text('Phone: 70254 50050 | 7994 189 193 | 7559 894 744', 10, 30);
+            doc.text('Email: soofitravelogues@gmail.com', 10, 40);
+            doc.text('Instagram: @soofi_travelogues', 10, 50);
+            doc.setLineWidth(0.5);
+            doc.line(10, 55, 200, 55);
+
+            // Add centered title
+            doc.setFontSize(18);
+            doc.setFont("Helvetica", "bold");
+            doc.text('Hotel / Resort Booking', doc.internal.pageSize.getWidth() / 2, 70, { align: 'center' });
+
+            // Reset font size for the rest of the document
+            doc.setFontSize(12);
+            doc.setFont("Helvetica", "normal");
+            doc.text(`Reference Number: ${serialNumber}`, 10, 80);
+            doc.text(`Date of Booking: ${dateOfBooking}`, 10, 90);
+            doc.text(`Guest Name: ${guestName}`, 10, 100);
+            doc.text(`Phone Number: ${phoneNumber}`, 10, 110);
+            doc.text(`Email: ${email}`, 10, 120);
+            doc.text(`Check-in Date: ${checkIn}`, 10, 130);
+            doc.text(`Check-out Date: ${checkOut}`, 10, 140);
+            doc.text(`Adults: ${adults}`, 10, 150);
+            doc.text(`Children: ${children}`, 10, 160);
+            doc.text(`Number of Rooms: ${numberOfRooms}`, 10, 170);
+            doc.text(`Per Room Rate: ${perRoomRate}`, 10, 180);
+            doc.text(`Total Amount: ${totalAmount}`, 10, 190);
+            doc.text(`Advance Amount: ${advanceAmount}`, 10, 200);
+            doc.text(`Balance Amount: ${balanceAmount}`, 10, 210);
+            doc.text(`Payment Method: ${paymentMethod}`, 10, 220);
+            doc.text(`Additional Services: ${additionalServices}`, 10, 230);
+
+            doc.text('NB: Advance amount is non-refundable if the trip is canceled for any reason.', 30, 250);
+
+            doc.line(10, 255, 200, 255); // Draw line after footer
+
+            doc.setFont("helvetica", "bold");
+            doc.text('For Soofi Travelogues', 155, 265);
+
+            doc.setFont("helvetica", "normal");
+            doc.text('Authorized Signature', 155, 270);
+
+            // Save PDF
+            doc.save(`${serialNumber}.pdf`);
+        };
+
+        // Generate initial reference number on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadReferenceNumber();
+        });
+    </script>
+</body>
+</html>
