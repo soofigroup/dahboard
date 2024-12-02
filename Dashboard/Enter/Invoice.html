@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Receipt Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Hidayatullah&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f7f9fc;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        h1, h3, .title {
+            color: #2c3e50;
+            text-align: center;
+            font-weight: bold;
+        }
+        h1 {
+            font-family: 'Hidayatullah', sans-serif;
+            color: #0f7893;
+            font-size: 20px;
+        }
+        h3 {
+            font-size: 10px;
+        }
+        .title {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="number"], input[type="date"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+            color: #0f7893; /* Updated color */
+        }
+        input[readonly] {
+            background-color: #e9ecef;
+            color: #0f7893; /* Updated color */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            color: #0f7893; /* Updated color */
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #888;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script>
+        let itemCount = 1;
+        let receiptNumber = 100;
+
+        function setCurrentDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById("receiptDate").value = today;
+        }
+
+        function generateReceiptNumber() {
+            return `RCPT-${receiptNumber++}`;
+        }
+
+        function calculateTotal(row) {
+            const rate = parseFloat(row.querySelector(".rate").value) || 0;
+            const quantity = parseFloat(row.querySelector(".quantity").value) || 0;
+            const totalCell = row.querySelector(".total");
+            totalCell.value = (rate * quantity).toFixed(2);
+            calculateSubtotalAndTotal();
+        }
+
+        function calculateSubtotalAndTotal() {
+            const totals = document.querySelectorAll(".total");
+            let subtotal = 0;
+
+            totals.forEach(cell => {
+                subtotal += parseFloat(cell.value) || 0;
+            });
+
+            document.getElementById("subtotal").value = subtotal.toFixed(2);
+
+            const tax = parseFloat(document.getElementById("tax").value) || 0;
+            const totalAmount = subtotal + tax;
+            document.getElementById("totalAmount").value = totalAmount.toFixed(2);
+
+            const advance = parseFloat(document.getElementById("advance").value) || 0;
+            const balance = totalAmount - advance;
+            document.getElementById("balance").value = balance.toFixed(2);
+        }
+
+        function addItemRow() {
+            itemCount++;
+            const tableBody = document.querySelector("table tbody");
+            const newRow = document.createElement("tr");
+
+            newRow.innerHTML = ` 
+                <td>${itemCount}</td>
+                <td><input type="text" /></td>
+                <td><input type="number" class="rate" oninput="calculateTotal(this.closest('tr'))" /></td>
+                <td><input type="number" class="quantity" oninput="calculateTotal(this.closest('tr'))" /></td>
+                <td><input type="number" class="total" readonly /></td>
+            `;
+
+            tableBody.appendChild(newRow);
+        }
+
+        async function printForm() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Add header
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor("#0f7893");
+            doc.setFontSize(45);
+            doc.text("SOOFI", 105, 20, { align: "center" });
+
+            // Contact and Instagram details
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(15);
+            doc.text("EVENTS & TRAVELS", 105, 30, { align: "center" });
+            doc.setFontSize(12);
+            doc.text("Phone: 7994 189 193 | 70254 50050", 105, 40, { align: "center" });
+            doc.text("Instagram: @soofi_travelogues", 105, 50, { align: "center" });
+            doc.line(10, 55, 200, 55); // Horizontal line
+
+            // Add "Receipt" title
+            doc.setFontSize(14);
+            doc.text("Receipt", 105, 60, { align: "center" });
+
+            // Receipt details
+            const receiptNum = document.getElementById("receiptNo").value;
+            const receiptDate = document.getElementById("receiptDate").value;
+            const name = document.getElementById("name").value;
+            const venue = document.getElementById("venue").value;
+            const guests = document.getElementById("guests").value;
+            
+            doc.setFontSize(12);
+            doc.text(`Receipt No: ${receiptNum}`, 15, 70);
+            doc.text(`Date: ${receiptDate}`, 15, 80);
+            doc.text(`Name: ${name}`, 15, 90);
+            doc.text(`Venue: ${venue}`, 15, 100);
+            doc.text(`No. of Guests: ${guests}`, 15, 110);
+
+            // Table Data
+            const tableData = Array.from(document.querySelectorAll("table tbody tr")).map((row, index) => {
+                const description = row.querySelector("input[type='text']").value || "";
+                const quantity = row.querySelector(".quantity").value || 0;
+                const total = row.querySelector(".total").value || 0;
+                return [index + 1, description, quantity, total];
+            });
+
+            doc.autoTable({
+    startY: 120,
+    head: [['S.No', 'Item Description', 'Quantity', 'Total']],
+    body: tableData,
+    theme: 'grid',
+    headStyles: {
+        fillColor: '#0f7893',  // Set header background color
+        textColor: '#ffffff',  // Set header text color (white)
+    },
+    bodyStyles: {
+        textColor: '#0f7893',  // Set body text color
+    },
+    alternateRowStyles: {
+        fillColor: '#f2f7f9'  // Set alternate row background color if desired
+    }
+});
+
+
+            // Amount details below table
+            const subtotal = document.getElementById("subtotal").value;
+            const tax = document.getElementById("tax").value;
+            const totalAmount = document.getElementById("totalAmount").value;
+            const advance = document.getElementById("advance").value;
+            const balance = document.getElementById("balance").value;
+
+            let finalY = doc.lastAutoTable.finalY + 10;
+            doc.text(`Subtotal: ${subtotal}`, 15, finalY);
+            doc.text(`Tax: ${tax}`, 15, finalY + 10);
+            doc.text(`Total Amount: ${totalAmount}`, 15, finalY + 20);
+            doc.text(`Advance: ${advance}`, 15, finalY + 30);
+            doc.text(`Balance: ${balance}`, 15, finalY + 40);
+
+            // Save PDF
+            doc.save(`${receiptNum}.pdf`);
+
+            // Update receipt number
+            document.getElementById("receiptNo").value = generateReceiptNumber();
+        }
+
+        window.onload = function() {
+            document.getElementById("receiptNo").value = generateReceiptNumber();
+            setCurrentDate();
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>SOOFI</h1>
+        <h3>EVENTS & TRAVELS</h3>
+        <p><strong>Phone No:</strong> 7994 189 193 | 70254 50050</p>
+        <p><strong>Instagram:</strong> @soofi_travelogues</p>
+        <hr>
+        <h3>Receipt</h3>
+        <p><strong>Receipt Number:</strong> <input type="text" id="receiptNo" readonly /></p>
+        <p><strong>Date:</strong> <input type="date" id="receiptDate" readonly /></p>
+
+        <p><strong>Name:</strong> <input type="text" id="name" /></p>
+        <p><strong>Venue:</strong> <input type="text" id="venue" /></p>
+        <p><strong>No. of Guests:</strong> <input type="number" id="guests" /></p>
+
+        <h3>Receipt Table:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Item Description</th>
+                    <th>Rate</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td><input type="text" /></td>
+                    <td><input type="number" class="rate" oninput="calculateTotal(this.closest('tr'))" /></td>
+                    <td><input type="number" class="quantity" oninput="calculateTotal(this.closest('tr'))" /></td>
+                    <td><input type="number" class="total" readonly /></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button onclick="addItemRow()">Add Item</button>
+
+        <h3>Amounts:</h3>
+        <p><strong>Subtotal:</strong> <input type="number" id="subtotal" readonly /></p>
+        <p><strong>Tax:</strong> <input type="number" id="tax" oninput="calculateSubtotalAndTotal()" /></p>
+        <p><strong>Total Amount:</strong> <input type="number" id="totalAmount" readonly /></p>
+        <p><strong>Advance:</strong> <input type="number" id="advance" oninput="calculateSubtotalAndTotal()" /></p>
+        <p><strong>Balance:</strong> <input type="number" id="balance" readonly /></p>
+
+        <h3>Actions:</h3>
+        <button onclick="printForm()">Generate PDF</button>
+    </div>
+
+    <div class="footer">
+        <p>SOOFI EVENTS & TRAVELS | Instagram: @soofi_travelogues</p>
+    </div>
+</body>
+</html>
